@@ -1,0 +1,116 @@
+Smart Lighting Control System — Requirements Specification
+Version 2.1 | QA Demo Document
+
+1. INTRODUCTION
+================
+This document specifies requirements for the Smart Lighting Control System (SLCS),
+a web-based and mobile application enabling building managers to control, schedule,
+and monitor lighting devices across one or more facilities.
+
+2. SCOPE
+=========
+The system integrates with:
+- KNX-based lighting fixtures via KNX/IP gateway
+- MQTT-enabled smart bulbs and LED strips
+- BACnet-compatible building automation systems
+- REST API for third-party integrations
+
+3. ACTORS
+==========
+- Building Manager: Primary user who configures zones and schedules
+- Facility Technician: Installs and registers devices, monitors system health
+- End User: Controls lighting in their workspace via mobile app
+- System Administrator: Manages user accounts and system configuration
+- API Consumer: Third-party systems integrating via REST API
+
+4. FUNCTIONAL REQUIREMENTS
+============================
+
+4.1 User Authentication and Authorisation
+------------------------------------------
+FR-001: The system shall allow users to log in using email and password.
+FR-002: Passwords must be at least 8 characters with at least one uppercase,
+        one lowercase, one number, and one special character.
+FR-003: The system shall lock an account after 5 consecutive failed login attempts for 15 minutes.
+FR-004: The system shall implement role-based access control with roles:
+        Admin, Building Manager, Technician, End User.
+FR-005: All API access shall require JWT bearer token authentication.
+FR-006: JWT tokens shall expire after 24 hours and support refresh tokens.
+
+4.2 Device Management
+----------------------
+FR-010: The system shall support registration of devices by MAC address or device serial number.
+FR-011: Supported device types: bulb, LED strip, panel, downlight, occupancy sensor.
+FR-012: Supported protocols: MQTT, KNX, BACnet, Zigbee, Wi-Fi Direct.
+FR-013: The system shall display real-time device status: online, offline, error.
+FR-014: Technicians shall be able to update device firmware over-the-air (OTA).
+FR-015: The system shall detect and alert when a device goes offline unexpectedly.
+FR-016: Device names must be between 2 and 100 characters.
+FR-017: The system shall support a maximum of 10,000 devices per installation.
+
+4.3 Zone Management
+--------------------
+FR-020: Building managers shall be able to create, edit, and delete lighting zones.
+FR-021: A zone shall contain zero or more devices.
+FR-022: A device can belong to exactly one zone at a time.
+FR-023: Zones shall be organizable by building floor.
+FR-024: Building managers shall be able to control all devices in a zone simultaneously.
+
+4.4 Lighting Control
+---------------------
+FR-030: Users shall be able to turn individual devices or zones on and off.
+FR-031: Users shall be able to dim devices to any brightness level between 0% and 100%.
+FR-032: Supported colour control: RGB hex value for colour-capable devices.
+FR-033: Colour temperature control shall support range 2700K (warm) to 6500K (cool).
+FR-034: Control commands shall be executed within 500 milliseconds under normal load.
+FR-035: The system shall queue commands if a device is temporarily unreachable
+        and retry up to 3 times with exponential back-off.
+
+4.5 Scheduling
+---------------
+FR-040: Building managers shall be able to create lighting schedules.
+FR-041: Schedules shall support daily, weekday, weekend, and custom day patterns.
+FR-042: Schedule time format: HH:MM in 24-hour format.
+FR-043: Schedules shall be timezone-aware.
+FR-044: The system shall support a maximum of 500 active schedules per installation.
+FR-045: Conflicting schedules for the same zone shall be flagged to the user.
+
+4.6 Monitoring and Alerts
+--------------------------
+FR-050: The system shall log all device state changes with timestamps.
+FR-051: The system shall send email or push notification alerts for:
+        - Device goes offline for more than 5 minutes
+        - OTA update failure
+        - System health below defined threshold
+FR-052: The dashboard shall display energy consumption per zone in kWh.
+FR-053: Logs shall be retained for a minimum of 90 days.
+
+5. NON-FUNCTIONAL REQUIREMENTS
+================================
+
+5.1 Performance
+----------------
+NFR-001: Dashboard load time shall be under 3 seconds for 95th percentile.
+NFR-002: API response time for device control commands shall be under 500ms at 95th percentile.
+NFR-003: The system shall support 1,000 concurrent users without degradation.
+
+5.2 Security
+-------------
+NFR-010: All data in transit must be encrypted using TLS 1.2 or higher.
+NFR-011: Passwords must be stored using bcrypt with minimum work factor 12.
+NFR-012: All API inputs must be validated and sanitised to prevent injection attacks.
+
+5.3 Availability
+-----------------
+NFR-020: The system shall achieve 99.5% uptime (max 43.8 hours downtime per year).
+NFR-021: Planned maintenance windows shall not exceed 2 hours per month.
+
+6. ACCEPTANCE CRITERIA
+=======================
+AC-001: A user with valid credentials can log in and reach the dashboard in under 5 seconds.
+AC-002: A device registered by MAC address appears in the device list within 30 seconds.
+AC-003: A lighting command sent from the UI reaches the physical device within 500ms.
+AC-004: A schedule created for 08:00 Monday triggers correctly within ±30 seconds.
+AC-005: Account locks after exactly 5 failed login attempts.
+AC-006: API returns 401 for expired JWT tokens.
+AC-007: OTA firmware update completes successfully for at least 99% of supported devices.

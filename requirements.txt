@@ -1,0 +1,34 @@
+# AI QA Copilot - Python Dependencies
+# Install with: pip install -r requirements.txt
+
+# ── Core Web UI ─────────────────────────────────────────────────────────────
+streamlit>=1.35.0
+
+# ── LLM Providers ───────────────────────────────────────────────────────────
+anthropic>=0.40.0          # Claude API
+openai>=1.40.0             # GPT-4 API
+requests>=2.32.0           # Ollama local
+
+# ── Document Parsing ─────────────────────────────────────────────────────────
+python-docx>=1.1.0         # DOCX reading and bug report export
+pdfplumber>=0.11.0         # PDF text extraction (preferred)
+PyPDF2>=3.0.1              # PDF fallback
+PyYAML>=6.0.1              # YAML/OpenAPI spec parsing
+
+# ── RAG / Vector Store ───────────────────────────────────────────────────────
+chromadb>=0.5.0            # Vector database
+
+# ── Data & Export ────────────────────────────────────────────────────────────
+pandas>=2.2.0              # DataFrames
+openpyxl>=3.1.0            # Excel export
+plotly>=5.22.0             # Interactive charts
+
+# ── Automation (for generated code validation, optional) ─────────────────────
+# playwright                # Install separately: pip install playwright && playwright install
+# selenium>=4.20.0
+# pytest>=8.0.0
+# pytest-playwright
+# httpx>=0.27.0
+
+# ── Utilities ────────────────────────────────────────────────────────────────
+python-dotenv>=1.0.0       # .env file support

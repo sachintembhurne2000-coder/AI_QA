@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  qa-copilot:
+    build: .
+    ports:
+      - "8501:8501"
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+    volumes:
+      - ./uploads:/app/uploads
+      - ./reports:/app/reports
+      - ./automation:/app/automation
+      - ./knowledge:/app/knowledge
+      - chroma_data:/app/.chroma_db
+    restart: unless-stopped
+
+volumes:
+  chroma_data:

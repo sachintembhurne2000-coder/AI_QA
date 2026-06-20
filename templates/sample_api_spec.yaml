@@ -1,0 +1,380 @@
+openapi: 3.0.3
+info:
+  title: Smart Lighting Control API
+  description: REST API for managing smart lighting devices, zones, and schedules
+  version: 2.1.0
+  contact:
+    name: API Support
+    email: api@smartlighting.example.com
+
+servers:
+  - url: https://api.smartlighting.example.com/v2
+    description: Production
+  - url: https://staging-api.smartlighting.example.com/v2
+    description: Staging
+
+security:
+  - bearerAuth: []
+
+paths:
+  /auth/login:
+    post:
+      summary: Authenticate and obtain JWT token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username:
+                  type: string
+                  example: admin@example.com
+                password:
+                  type: string
+                  format: password
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  expires_in:
+                    type: integer
+                  user_id:
+                    type: string
+        '401':
+          description: Invalid credentials
+        '429':
+          description: Rate limit exceeded
+
+  /devices:
+    get:
+      summary: List all devices
+      parameters:
+        - name: zone_id
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [online, offline, error]
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+      responses:
+        '200':
+          description: List of devices
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  devices:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Device'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+        '401':
+          description: Unauthorized
+
+    post:
+      summary: Register a new device
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceCreate'
+      responses:
+        '201':
+          description: Device registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+        '400':
+          description: Invalid device data
+        '409':
+          description: Device already registered
+
+  /devices/{device_id}:
+    get:
+      summary: Get device by ID
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Device details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+        '404':
+          description: Device not found
+
+    patch:
+      summary: Update device settings
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceUpdate'
+      responses:
+        '200':
+          description: Device updated
+        '400':
+          description: Invalid update data
+        '404':
+          description: Device not found
+
+    delete:
+      summary: Remove a device
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Device removed
+        '404':
+          description: Device not found
+
+  /devices/{device_id}/control:
+    post:
+      summary: Send control command to device
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [command]
+              properties:
+                command:
+                  type: string
+                  enum: [on, off, dim, set_color, set_temperature]
+                brightness:
+                  type: integer
+                  minimum: 0
+                  maximum: 100
+                color:
+                  type: string
+                  pattern: '^#[0-9A-Fa-f]{6}$'
+                color_temperature:
+                  type: integer
+                  minimum: 2700
+                  maximum: 6500
+      responses:
+        '200':
+          description: Command sent
+        '400':
+          description: Invalid command or parameters
+        '404':
+          description: Device not found
+        '503':
+          description: Device offline
+
+  /zones:
+    get:
+      summary: List all zones
+      responses:
+        '200':
+          description: List of zones
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Zone'
+
+    post:
+      summary: Create a new zone
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ZoneCreate'
+      responses:
+        '201':
+          description: Zone created
+        '400':
+          description: Invalid zone data
+
+  /schedules:
+    get:
+      summary: List all schedules
+      responses:
+        '200':
+          description: List of schedules
+
+    post:
+      summary: Create a lighting schedule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Schedule'
+      responses:
+        '201':
+          description: Schedule created
+        '400':
+          description: Invalid schedule
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Device:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+          enum: [bulb, strip, panel, downlight, sensor]
+        protocol:
+          type: string
+          enum: [mqtt, knx, bacnet, zigbee, wifi]
+        zone_id:
+          type: string
+        status:
+          type: string
+          enum: [online, offline, error]
+        brightness:
+          type: integer
+          minimum: 0
+          maximum: 100
+        color_temperature:
+          type: integer
+        firmware_version:
+          type: string
+        last_seen:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+
+    DeviceCreate:
+      type: object
+      required: [name, type, protocol]
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 100
+        type:
+          type: string
+          enum: [bulb, strip, panel, downlight, sensor]
+        protocol:
+          type: string
+          enum: [mqtt, knx, bacnet, zigbee, wifi]
+        zone_id:
+          type: string
+        mac_address:
+          type: string
+          pattern: '^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$'
+
+    DeviceUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        zone_id:
+          type: string
+        settings:
+          type: object
+
+    Zone:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        floor:
+          type: integer
+        device_count:
+          type: integer
+
+    ZoneCreate:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+        floor:
+          type: integer
+        description:
+          type: string
+
+    Schedule:
+      type: object
+      required: [name, zone_id, time, action]
+      properties:
+        name:
+          type: string
+        zone_id:
+          type: string
+        time:
+          type: string
+          pattern: '^([01]?[0-9]|2[0-3]):[0-5][0-9]$'
+        days:
+          type: array
+          items:
+            type: string
+            enum: [mon, tue, wed, thu, fri, sat, sun]
+        action:
+          type: string
+          enum: [on, off, dim]
+        brightness:
+          type: integer
+          minimum: 0
+          maximum: 100

@@ -1,0 +1,50 @@
+# ── Python ───────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+*.whl
+
+# ── Virtual environments ──────────────────────────────────────
+.venv/
+venv/
+env/
+ENV/
+
+# ── Secrets — NEVER commit these ─────────────────────────────
+.env
+*.key
+*.pem
+secrets/
+
+# ── AI QA Copilot runtime data ───────────────────────────────
+uploads/
+reports/
+automation/
+.chroma_db/
+
+# ── Streamlit ─────────────────────────────────────────────────
+.streamlit/secrets.toml
+
+# ── IDE / OS ─────────────────────────────────────────────────
+.idea/
+.vscode/
+*.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# ── Docker ────────────────────────────────────────────────────
+*.tar
+
+# ── Test artefacts ────────────────────────────────────────────
+.pytest_cache/
+htmlcov/
+.coverage
+coverage.xml

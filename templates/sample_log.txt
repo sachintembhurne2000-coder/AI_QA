@@ -1,0 +1,95 @@
+2024-11-15 08:00:01.002 [INFO]  Gateway v2.3.1 starting up...
+2024-11-15 08:00:01.105 [INFO]  Loading configuration from /etc/gateway/config.yaml
+2024-11-15 08:00:01.210 [INFO]  MQTT broker: mqtt://broker.local:1883
+2024-11-15 08:00:01.312 [INFO]  KNX/IP gateway: 192.168.1.50:3671
+2024-11-15 08:00:01.415 [INFO]  BACnet device ID: 1001, port: 47808
+2024-11-15 08:00:02.001 [INFO]  MQTT connecting to broker.local:1883...
+2024-11-15 08:00:02.213 [INFO]  MQTT connected. ClientID: gw-prod-001
+2024-11-15 08:00:02.215 [INFO]  MQTT subscribing to: building/+/device/+/command
+2024-11-15 08:00:02.401 [INFO]  MQTT subscribing to: building/+/zone/+/command
+2024-11-15 08:00:02.601 [INFO]  KNX/IP tunnel connecting to 192.168.1.50...
+2024-11-15 08:00:02.890 [INFO]  KNX/IP tunnel established. Channel: 3
+2024-11-15 08:00:03.001 [INFO]  BACnet/IP initialised on 0.0.0.0:47808
+2024-11-15 08:00:03.102 [INFO]  Sending BACnet WhoIs broadcast...
+2024-11-15 08:00:03.450 [INFO]  BACnet IAm received: Device 1010 at 192.168.1.60
+2024-11-15 08:00:03.451 [INFO]  BACnet IAm received: Device 1020 at 192.168.1.61
+2024-11-15 08:00:03.452 [INFO]  BACnet IAm received: Device 1030 at 192.168.1.62
+2024-11-15 08:00:05.000 [INFO]  System initialisation complete. 3 BACnet devices, 0 errors.
+
+2024-11-15 08:15:33.001 [INFO]  MQTT message received: building/floor2/device/light-007/command {"action":"on","brightness":80}
+2024-11-15 08:15:33.005 [INFO]  Routing command to KNX group address 2/1/7
+2024-11-15 08:15:33.120 [INFO]  KNX telegram sent: GA=2/1/7 DPT=1.001 value=1
+2024-11-15 08:15:33.250 [INFO]  KNX telegram sent: GA=2/2/7 DPT=5.001 value=80
+2024-11-15 08:15:33.380 [INFO]  Device light-007 command executed successfully
+
+2024-11-15 09:02:11.001 [INFO]  MQTT message received: building/floor1/zone/meeting-rooms/command {"action":"dim","brightness":50}
+2024-11-15 09:02:11.010 [INFO]  Zone meeting-rooms: 6 devices to update
+2024-11-15 09:02:11.050 [INFO]  KNX telegram sent: GA=1/1/10 DPT=5.001 value=50
+2024-11-15 09:02:11.150 [INFO]  KNX telegram sent: GA=1/1/11 DPT=5.001 value=50
+2024-11-15 09:02:11.250 [INFO]  KNX telegram sent: GA=1/1/12 DPT=5.001 value=50
+2024-11-15 09:02:11.350 [INFO]  KNX telegram sent: GA=1/1/13 DPT=5.001 value=50
+2024-11-15 09:02:12.001 [WARN]  KNX telegram timeout: GA=1/1/14 — no ACK after 500ms, retrying (1/3)
+2024-11-15 09:02:12.510 [WARN]  KNX telegram timeout: GA=1/1/14 — no ACK after 500ms, retrying (2/3)
+2024-11-15 09:02:13.020 [WARN]  KNX telegram timeout: GA=1/1/14 — no ACK after 500ms, retrying (3/3)
+2024-11-15 09:02:13.530 [ERROR] KNX telegram FAILED: GA=1/1/14 — max retries exhausted
+2024-11-15 09:02:13.531 [ERROR] Device light-014 unresponsive. Marking status=error
+2024-11-15 09:02:13.540 [INFO]  KNX telegram sent: GA=1/1/15 DPT=5.001 value=50
+2024-11-15 09:02:13.650 [INFO]  Zone meeting-rooms: 5/6 devices updated (1 error: light-014)
+
+2024-11-15 09:45:00.001 [INFO]  BACnet COV notification: Device 1010 AI:0 present-value=22.5 (temperature)
+2024-11-15 09:45:00.100 [INFO]  BACnet COV notification: Device 1010 BI:1 present-value=active (occupancy)
+2024-11-15 09:46:33.001 [INFO]  Occupancy trigger: meeting-room-A occupied → activating scene OCCUPIED
+2024-11-15 09:46:33.050 [INFO]  Scene OCCUPIED: setting brightness=85, colour_temp=4000K
+
+2024-11-15 10:30:15.001 [WARN]  MQTT connection lost. RC=7 (connection closed by remote)
+2024-11-15 10:30:15.002 [INFO]  MQTT reconnect attempt 1/5 in 2s...
+2024-11-15 10:30:17.005 [INFO]  MQTT reconnect attempt 2/5...
+2024-11-15 10:30:17.105 [ERROR] MQTT connect refused: RC=5 (not authorised)
+2024-11-15 10:30:17.106 [ERROR] MQTT authentication failure — check broker credentials
+2024-11-15 10:30:17.107 [CRIT]  MQTT reconnect failed: max attempts reached. Gateway entering degraded mode.
+2024-11-15 10:30:17.108 [WARN]  Commands will be queued locally until MQTT connection restored.
+2024-11-15 10:30:17.200 [INFO]  Local command queue initialised (max 500 messages)
+
+2024-11-15 10:30:45.001 [WARN]  Queued command: building/floor2/device/light-021/command {"action":"off"}
+2024-11-15 10:31:00.001 [WARN]  Queued command: building/floor1/zone/lobby/command {"action":"on","brightness":100}
+2024-11-15 10:31:30.001 [WARN]  Queued command: building/floor3/device/light-033/command {"action":"dim","brightness":60}
+
+2024-11-15 10:45:22.001 [INFO]  MQTT reconnect attempt (scheduled retry)...
+2024-11-15 10:45:22.201 [INFO]  MQTT connected. ClientID: gw-prod-001
+2024-11-15 10:45:22.210 [INFO]  MQTT connection restored. Processing 3 queued commands...
+2024-11-15 10:45:22.310 [INFO]  Queued command dispatched: building/floor2/device/light-021/command
+2024-11-15 10:45:22.410 [INFO]  Queued command dispatched: building/floor1/zone/lobby/command
+2024-11-15 10:45:22.510 [INFO]  Queued command dispatched: building/floor3/device/light-033/command
+2024-11-15 10:45:22.600 [INFO]  Queue drained. Resuming normal operation.
+
+2024-11-15 11:00:00.001 [INFO]  Schedule trigger: MORNING_BRIGHT at 11:00
+2024-11-15 11:00:00.050 [INFO]  Applying scene to 24 devices across 4 zones...
+2024-11-15 11:00:01.500 [INFO]  Schedule MORNING_BRIGHT applied: 23/24 devices (1 offline: light-014)
+
+2024-11-15 12:30:00.001 [INFO]  Modbus poll: slave 3 (energy-meter-floor1) registers 0-9
+2024-11-15 12:30:00.050 [INFO]  Modbus response: slave 3 OK. Energy=45.2kWh, Power=2.1kW
+2024-11-15 12:30:00.100 [INFO]  Modbus poll: slave 4 (energy-meter-floor2) registers 0-9
+2024-11-15 12:30:00.800 [ERROR] Modbus timeout: slave 4 did not respond within 700ms
+2024-11-15 12:30:00.801 [WARN]  Retrying Modbus slave 4...
+2024-11-15 12:30:01.510 [ERROR] Modbus timeout: slave 4 — retry 1 failed
+2024-11-15 12:30:02.220 [ERROR] Modbus timeout: slave 4 — retry 2 failed. Exception code: 04 (SLAVE_DEVICE_FAILURE)
+2024-11-15 12:30:02.221 [ERROR] Energy meter floor2 unreachable. Last reading: 2024-11-15 10:00:00
+
+2024-11-15 14:15:44.001 [INFO]  OTA update initiated for device light-014 (fw 1.2.0 → 1.3.1)
+2024-11-15 14:15:44.100 [INFO]  Downloading firmware chunk 1/48 for light-014...
+2024-11-15 14:15:47.200 [INFO]  Downloading firmware chunk 24/48 for light-014...
+2024-11-15 14:15:50.100 [INFO]  Downloading firmware chunk 48/48 for light-014 — download complete
+2024-11-15 14:15:50.200 [INFO]  Verifying firmware checksum: SHA256 OK
+2024-11-15 14:15:50.300 [INFO]  Flashing firmware to light-014...
+2024-11-15 14:16:10.001 [INFO]  light-014 rebooting after OTA...
+2024-11-15 14:16:25.001 [INFO]  light-014 back online. Firmware: 1.3.1
+2024-11-15 14:16:25.100 [INFO]  OTA update successful: light-014
+
+2024-11-15 17:30:00.001 [INFO]  Schedule trigger: EVENING_DIM at 17:30
+2024-11-15 17:30:00.050 [INFO]  Applying scene to 24 devices across 4 zones...
+2024-11-15 17:30:01.800 [INFO]  Schedule EVENING_DIM applied: 24/24 devices OK
+
+2024-11-15 23:00:00.001 [INFO]  Schedule trigger: NIGHT_OFF at 23:00
+2024-11-15 23:00:00.050 [INFO]  Powering off all 24 devices across 4 zones...
+2024-11-15 23:00:01.900 [INFO]  All devices off. System entering low-power monitoring mode.
+2024-11-15 23:00:02.000 [INFO]  Daily summary: Commands=847, Errors=4, Warnings=9, Uptime=14h59m

@@ -1,0 +1,127 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-8.1.1, pluggy-1.4.0
+rootdir: /workspace/slcs-tests
+configfile: pytest.ini
+plugins: playwright-0.5.0, asyncio-0.23.6, httpx-0.21.0
+collected 42 items
+
+tests/test_auth.py::test_login_valid_credentials PASSED                  [  2%]
+tests/test_auth.py::test_login_invalid_password PASSED                   [  4%]
+tests/test_auth.py::test_login_account_lockout PASSED                    [  7%]
+tests/test_auth.py::test_jwt_token_expiry PASSED                         [  9%]
+tests/test_devices.py::test_list_devices_authenticated PASSED            [ 11%]
+tests/test_devices.py::test_list_devices_with_zone_filter PASSED         [ 14%]
+tests/test_devices.py::test_register_device_valid_data PASSED            [ 16%]
+tests/test_devices.py::test_register_device_duplicate_mac FAILED         [ 19%]
+tests/test_devices.py::test_get_device_by_id PASSED                      [ 21%]
+tests/test_devices.py::test_get_device_not_found PASSED                  [ 23%]
+tests/test_devices.py::test_update_device_name PASSED                    [ 26%]
+tests/test_devices.py::test_delete_device FAILED                         [ 28%]
+tests/test_control.py::test_turn_device_on PASSED                        [ 30%]
+tests/test_control.py::test_turn_device_off PASSED                       [ 33%]
+tests/test_control.py::test_dim_device_valid_brightness PASSED           [ 35%]
+tests/test_control.py::test_dim_device_brightness_above_max FAILED       [ 38%]
+tests/test_control.py::test_set_colour_valid_hex PASSED                  [ 40%]
+tests/test_control.py::test_set_colour_invalid_hex PASSED                [ 42%]
+tests/test_control.py::test_control_offline_device PASSED                [ 44%]
+tests/test_zones.py::test_create_zone PASSED                             [ 47%]
+tests/test_zones.py::test_list_zones PASSED                              [ 49%]
+tests/test_zones.py::test_zone_control_all_devices FAILED                [ 51%]
+tests/test_schedules.py::test_create_schedule_valid PASSED               [ 54%]
+tests/test_schedules.py::test_create_schedule_invalid_time_format PASSED [ 56%]
+tests/test_schedules.py::test_schedule_conflict_detection FAILED         [ 58%]
+tests/test_schedules.py::test_schedule_triggers_on_time ERROR            [ 61%]
+tests/test_monitoring.py::test_device_offline_alert PASSED               [ 63%]
+tests/test_monitoring.py::test_energy_consumption_reading FAILED         [ 65%]
+
+================================== FAILURES ===================================
+
+___ test_register_device_duplicate_mac ___
+
+tests/test_devices.py:87: in test_register_device_duplicate_mac
+    response = client.post("/devices", json=payload)
+tests/test_devices.py:89: in test_register_device_duplicate_mac
+    assert response.status_code == 409
+AssertionError: assert 500 == 409
+ +  where 500 = <Response [500 Internal Server Error]>.status_code
+Response body: {"detail": "Internal Server Error", "trace_id": "abc-123-xyz"}
+
+Server logs for this request:
+  ERROR: duplicate key value violates unique constraint "devices_mac_address_key"
+  DETAIL: Key (mac_address)=(AA:BB:CC:DD:EE:01) already exists.
+  sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation)
+
+___ test_delete_device ___
+
+tests/test_devices.py:143: in test_delete_device
+    response = client.delete(f"/devices/{device_id}")
+tests/test_devices.py:145: in test_delete_device
+    assert response.status_code == 204
+AssertionError: assert 403 == 204
+ +  where 403 = <Response [403 Forbidden]>.status_code
+Response body: {"detail": "Permission denied: Technician role cannot delete devices"}
+
+Note: Test was run with Technician role fixture instead of Admin role.
+Expected: Test user should have Admin role for delete operations.
+
+___ test_dim_device_brightness_above_max ___
+
+tests/test_control.py:201: in test_dim_device_brightness_above_max
+    response = client.post(f"/devices/{device_id}/control",
+                           json={"command": "dim", "brightness": 150})
+tests/test_control.py:204: in test_dim_device_brightness_above_max
+    assert response.status_code == 400
+AssertionError: assert 200 == 400
+ +  where 200 = <Response [200 OK]>.status_code
+Response body: {"status": "command_sent", "device_id": "dev-042", "brightness": 150}
+
+CRITICAL: API accepts brightness=150 (above maximum of 100) without validation error.
+Device received brightness=150 which caused firmware exception on device dev-042.
+Device log shows: [ERROR] brightness value 150 out of range [0,100] — clamping to 100
+
+___ test_zone_control_all_devices ___
+
+tests/test_zones.py:178: in test_zone_control_all_devices
+    response = client.post(f"/zones/{zone_id}/control",
+                           json={"action": "dim", "brightness": 50})
+tests/test_zones.py:181: in test_zone_control_all_devices
+    assert response.status_code == 200
+AssertionError: assert 404 == 200
+ +  where 404 = <Response [404 Not Found]>.status_code
+Response body: {"detail": "Zone control endpoint not found"}
+
+Zone control endpoint /zones/{zone_id}/control appears to be unimplemented.
+OpenAPI spec documents this endpoint but implementation is missing.
+
+___ test_schedule_conflict_detection ___
+
+tests/test_schedules.py:234: in test_schedule_conflict_detection
+    response2 = client.post("/schedules", json=conflicting_schedule)
+tests/test_schedules.py:237: in test_schedule_conflict_detection
+    assert response2.status_code == 409
+AssertionError: assert 201 == 409
+ +  where 201 = <Response [201 Created]>.status_code
+
+Two conflicting schedules for zone meeting-room-A at 08:00 Monday were both accepted.
+No conflict warning or error was returned. This will cause unpredictable device behaviour.
+
+================================== ERRORS =====================================
+
+__ ERROR in test_schedule_triggers_on_time __
+
+tests/test_schedules.py:289: in test_schedule_triggers_on_time
+    import faketime
+ModuleNotFoundError: No module named 'faketime'
+
+This test requires the 'faketime' package to mock system time.
+Install with: pip install faketime
+
+================================= short test summary info ======================
+FAILED tests/test_devices.py::test_register_device_duplicate_mac - AssertionError: assert 500 == 409
+FAILED tests/test_devices.py::test_delete_device - AssertionError: assert 403 == 204
+FAILED tests/test_control.py::test_dim_device_brightness_above_max - AssertionError: assert 200 == 400
+FAILED tests/test_zones.py::test_zone_control_all_devices - AssertionError: assert 404 == 200
+FAILED tests/test_schedules.py::test_schedule_conflict_detection - AssertionError: assert 201 == 409
+FAILED tests/test_monitoring.py::test_energy_consumption_reading - fixture 'modbus_mock' not found
+ERROR  tests/test_schedules.py::test_schedule_triggers_on_time - ModuleNotFoundError
+======================= 6 failed, 1 error, 21 passed in 18.43s =================
