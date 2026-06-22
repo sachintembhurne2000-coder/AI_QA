@@ -123,13 +123,35 @@ with st.sidebar:
         model = st.selectbox("Model", ["gpt-4o", "gpt-4-turbo", "gpt-4"], key="oai_model")
     else:
         api_key = ""
-        model = st.text_input("Ollama Model", value="llama3.2", key="ollama_model")
+        ollama_models = [
+            "Select a model...",
+            "deepseek-r1:8b",
+            "openhermes:v2.5",
+            "phi3:3.8b",
+            "deepseek-coder:6.7b",
+            "qwen2.5-coder:7b",
+            "llama2:latest",
+            "llama3.2",
+        ]
+        # Determine a safe default index (use placeholder by default)
+        default_idx = 0
+        if "ollama_model" in st.session_state and st.session_state.get("ollama_model") in ollama_models:
+            default_idx = ollama_models.index(st.session_state.get("ollama_model"))
+
+        model = st.selectbox("Ollama Model", ollama_models, index=default_idx, key="ollama_model")
         st.caption("Make sure Ollama is running on localhost:11434")
 
-    # Store in session
-    st.session_state["llm_provider"] = llm_provider
+    # Store in session (avoid overwriting widget-managed keys)
+    if "llm_provider" not in st.session_state:
+        st.session_state["llm_provider"] = llm_provider
     st.session_state["api_key"] = api_key
-    st.session_state["model"] = model
+    # Only store the model if user explicitly selected one (not the placeholder)
+    if model and model != "Select a model...":
+        st.session_state["model"] = model
+    else:
+        # Remove any previous model selection to force explicit runtime choice
+        if "model" in st.session_state:
+            del st.session_state["model"]
 
     st.markdown("---")
     st.caption("Built for hackathon demo · Uses Anthropic/OpenAI APIs")
