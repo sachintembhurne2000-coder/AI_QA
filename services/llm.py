@@ -88,7 +88,7 @@ def _call_ollama(model: str, system: str, user: str, max_tokens: int) -> str:
                     {"role": "user", "content": user},
                 ],
             },
-            timeout=120,
+            timeout=300,
         )
         resp.raise_for_status()
         return resp.json()["message"]["content"]
